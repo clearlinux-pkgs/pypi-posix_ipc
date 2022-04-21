@@ -4,7 +4,7 @@
 #
 Name     : pypi-posix_ipc
 Version  : 1.0.5
-Release  : 64
+Release  : 65
 URL      : https://files.pythonhosted.org/packages/bc/2f/9a7901aa26fb0e02a671b989ba814d059a0f45af85cea31b9c9eef7e2dda/posix_ipc-1.0.5.tar.gz
 Source0  : https://files.pythonhosted.org/packages/bc/2f/9a7901aa26fb0e02a671b989ba814d059a0f45af85cea31b9c9eef7e2dda/posix_ipc-1.0.5.tar.gz
 Summary  : POSIX IPC primitives (semaphores, shared memory and message queues) for Python
@@ -14,11 +14,8 @@ Requires: pypi-posix_ipc-license = %{version}-%{release}
 Requires: pypi-posix_ipc-python = %{version}-%{release}
 Requires: pypi-posix_ipc-python3 = %{version}-%{release}
 BuildRequires : buildreq-distutils3
-Provides: posix_ipc
-Provides: posix_ipc-python
-Provides: posix_ipc-python3
-BuildRequires : py
-BuildRequires : pytest
+BuildRequires : pypi-py
+BuildRequires : pypi-pytest
 
 %description
 manipulation of POSIX inter-process semaphores, shared memory and message 
@@ -65,7 +62,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1641470731
+export SOURCE_DATE_EPOCH=1650520417
 export GCC_IGNORE_WERROR=1
 export CFLAGS="$CFLAGS -fno-lto "
 export FCFLAGS="$FFLAGS -fno-lto "
