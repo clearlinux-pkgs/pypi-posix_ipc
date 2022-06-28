@@ -4,12 +4,14 @@
 #
 Name     : pypi-posix_ipc
 Version  : 1.0.5
-Release  : 65
+Release  : 66
 URL      : https://files.pythonhosted.org/packages/bc/2f/9a7901aa26fb0e02a671b989ba814d059a0f45af85cea31b9c9eef7e2dda/posix_ipc-1.0.5.tar.gz
 Source0  : https://files.pythonhosted.org/packages/bc/2f/9a7901aa26fb0e02a671b989ba814d059a0f45af85cea31b9c9eef7e2dda/posix_ipc-1.0.5.tar.gz
 Summary  : POSIX IPC primitives (semaphores, shared memory and message queues) for Python
 Group    : Development/Tools
 License  : BSD-2-Clause BSD-3-Clause
+Requires: pypi-posix_ipc-filemap = %{version}-%{release}
+Requires: pypi-posix_ipc-lib = %{version}-%{release}
 Requires: pypi-posix_ipc-license = %{version}-%{release}
 Requires: pypi-posix_ipc-python = %{version}-%{release}
 Requires: pypi-posix_ipc-python3 = %{version}-%{release}
@@ -25,6 +27,24 @@ manipulation of POSIX inter-process semaphores, shared memory and message
         posix_ipc is compatible with Python 2 and 3.
         
         The latest version, contact info, sample code, etc. are available on PyPI
+
+%package filemap
+Summary: filemap components for the pypi-posix_ipc package.
+Group: Default
+
+%description filemap
+filemap components for the pypi-posix_ipc package.
+
+
+%package lib
+Summary: lib components for the pypi-posix_ipc package.
+Group: Libraries
+Requires: pypi-posix_ipc-license = %{version}-%{release}
+Requires: pypi-posix_ipc-filemap = %{version}-%{release}
+
+%description lib
+lib components for the pypi-posix_ipc package.
+
 
 %package license
 Summary: license components for the pypi-posix_ipc package.
@@ -46,6 +66,7 @@ python components for the pypi-posix_ipc package.
 %package python3
 Summary: python3 components for the pypi-posix_ipc package.
 Group: Default
+Requires: pypi-posix_ipc-filemap = %{version}-%{release}
 Requires: python3-core
 Provides: pypi(posix_ipc)
 
@@ -56,13 +77,16 @@ python3 components for the pypi-posix_ipc package.
 %prep
 %setup -q -n posix_ipc-1.0.5
 cd %{_builddir}/posix_ipc-1.0.5
+pushd ..
+cp -a posix_ipc-1.0.5 buildavx2
+popd
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1650520417
+export SOURCE_DATE_EPOCH=1656387348
 export GCC_IGNORE_WERROR=1
 export CFLAGS="$CFLAGS -fno-lto "
 export FCFLAGS="$FFLAGS -fno-lto "
@@ -76,6 +100,15 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 PYTHONPATH=%{buildroot}}$(python -c "import sys; print(sys.path[-1])") pytest --verbose || :
+pushd ../buildavx2/
+export CFLAGS="$CFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 "
+export CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 "
+export FFLAGS="$FFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 "
+export FCFLAGS="$FCFLAGS -m64 -march=x86-64-v3 "
+export LDFLAGS="$LDFLAGS -m64 -march=x86-64-v3 "
+python3 setup.py build
+
+popd
 %install
 export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
@@ -85,9 +118,26 @@ python3 -tt setup.py build  install --root=%{buildroot}
 echo ----[ mark ]----
 cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
 echo ----[ mark ]----
+pushd ../buildavx2/
+export CFLAGS="$CFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 "
+export CXXFLAGS="$CXXFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 "
+export FFLAGS="$FFLAGS -m64 -march=x86-64-v3 -Wl,-z,x86-64-v3 "
+export FCFLAGS="$FCFLAGS -m64 -march=x86-64-v3 "
+export LDFLAGS="$LDFLAGS -m64 -march=x86-64-v3 "
+python3 -tt setup.py build install --root=%{buildroot}-v3
+popd
+/usr/bin/elf-move.py avx2 %{buildroot}-v3 %{buildroot} %{buildroot}/usr/share/clear/filemap/filemap-%{name}
 
 %files
 %defattr(-,root,root,-)
+
+%files filemap
+%defattr(-,root,root,-)
+/usr/share/clear/filemap/filemap-pypi-posix_ipc
+
+%files lib
+%defattr(-,root,root,-)
+/usr/share/clear/optimized-elf/other*
 
 %files license
 %defattr(0644,root,root,0755)
