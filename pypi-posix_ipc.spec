@@ -7,12 +7,13 @@
 #
 Name     : pypi-posix_ipc
 Version  : 1.2.0
-Release  : 82
+Release  : 83
 URL      : https://files.pythonhosted.org/packages/9c/2a/a57c6feeb9efc74d0c6867a915abf9dc00747e1789dc8d33c0ef5bf37906/posix_ipc-1.2.0.tar.gz
 Source0  : https://files.pythonhosted.org/packages/9c/2a/a57c6feeb9efc74d0c6867a915abf9dc00747e1789dc8d33c0ef5bf37906/posix_ipc-1.2.0.tar.gz
 Summary  : POSIX IPC primitives (semaphores, shared memory and message queues) for Python
 Group    : Development/Tools
 License  : BSD-3-Clause
+Requires: pypi-posix_ipc-license = %{version}-%{release}
 Requires: pypi-posix_ipc-python = %{version}-%{release}
 Requires: pypi-posix_ipc-python3 = %{version}-%{release}
 BuildRequires : buildreq-distutils3
@@ -27,6 +28,14 @@ BuildRequires : pypi-pytest
 %description
 # POSIX IPC
 `posix_ipc` is a Python module (written in C) that permits creation and manipulation of POSIX inter-process semaphores, shared memory and message queues on platforms supporting the POSIX Realtime Extensions a.k.a. POSIX 1003.1b-1993. This includes nearly all Unices, and Windows + Cygwin ≥ 1.7.
+
+%package license
+Summary: license components for the pypi-posix_ipc package.
+Group: Default
+
+%description license
+license components for the pypi-posix_ipc package.
+
 
 %package python
 Summary: python components for the pypi-posix_ipc package.
@@ -59,7 +68,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1744898273
+export SOURCE_DATE_EPOCH=1744909261
 export GCC_IGNORE_WERROR=1
 CLEAR_INTERMEDIATE_CFLAGS="$CLEAR_INTERMEDIATE_CFLAGS -fdebug-types-section -femit-struct-debug-baseonly -fno-lto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
 CLEAR_INTERMEDIATE_FCFLAGS="$CLEAR_INTERMEDIATE_FFLAGS -fdebug-types-section -femit-struct-debug-baseonly -fno-lto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
@@ -105,6 +114,8 @@ ASFLAGS="$CLEAR_INTERMEDIATE_ASFLAGS"
 LDFLAGS="$CLEAR_INTERMEDIATE_LDFLAGS"
 export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/pypi-posix_ipc
+cp %{_builddir}/posix_ipc-%{version}/LICENSE %{buildroot}/usr/share/package-licenses/pypi-posix_ipc/af1380a0881045a68ee352b7f0407b445d25b83e || :
 python3 -m installer --destdir=%{buildroot} dist/*.whl
 echo ----[ mark ]----
 cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
@@ -121,6 +132,10 @@ popd
 
 %files
 %defattr(-,root,root,-)
+
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/pypi-posix_ipc/af1380a0881045a68ee352b7f0407b445d25b83e
 
 %files python
 %defattr(-,root,root,-)
